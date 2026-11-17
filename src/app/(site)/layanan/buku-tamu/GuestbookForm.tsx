@@ -30,7 +30,7 @@ export default function GuestbookForm() {
 
   const input = "mt-1.5 block w-full rounded-btn border border-line bg-white px-3 py-2.5 text-sm outline-none focus:border-ink aria-[invalid=true]:border-red-600";
   return (
-    <form onSubmit={onSubmit} noValidate className="max-w-xl space-y-5">
+    <form onSubmit={onSubmit} method="post" noValidate className="max-w-xl space-y-5">
       {FIELDS.map((f) => (
         <div key={f.name}>
           <label htmlFor={f.name} className="text-sm font-medium">{f.label} <span aria-hidden className="text-eyebrow">*</span></label>

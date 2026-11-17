@@ -22,7 +22,8 @@ export default function AdminForm({ action, children, className = "space-y-5", r
   useEffect(() => { if (resetOnSuccess && state?.ok) ref.current?.reset(); }, [state, resetOnSuccess]);
   return (
     <Ctx.Provider value={{ state, pending }}>
-      <form ref={ref} className={className} noValidate aria-busy={pending}
+      {/* method="post": bila JavaScript gagal dimuat, browser tidak menaruh isian (mis. password) di URL */}
+      <form ref={ref} method="post" className={className} noValidate aria-busy={pending}
         onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); startTransition(() => formAction(fd)); }}>
         {state?.message && (
           <p role={state.ok ? "status" : "alert"}
