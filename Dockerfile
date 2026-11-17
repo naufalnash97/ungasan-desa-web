@@ -27,4 +27,4 @@ RUN mkdir -p /app/uploads && chown app:app /app/uploads
 USER app
 EXPOSE 3000
 HEALTHCHECK CMD wget -qO- http://localhost:3000/api/health || exit 1
-CMD ["sh", "-c", "npx drizzle-kit migrate && node server.js"]
+CMD ["sh", "-c", "npx tsx src/db/migrate.ts && node server.js"]
