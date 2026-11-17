@@ -1,0 +1,35 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: ungasan, POSTGRES_PASSWORD: ungasan, POSTGRES_DB: ungasan }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ungasan" --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://ungasan:ungasan@localhost:5432/ungasan
+      ADMIN_API_TOKEN: ci-token-0123456789-abcdefghijklmnopqrstuvwxyz
+      IP_HASH_SALT: ci-salt
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npx drizzle-kit migrate
+      - run: npx tsx src/db/seed.ts
+      - run: npm run build
+      - name: Smoke test
+        run: |
+          npm start & sleep 8
+          for u in / /transparansi/apbdes /layanan /berita /api/health /api/v1/apbdes; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:3000$u"); echo "$code $u"; test "$code" = 200
+          done

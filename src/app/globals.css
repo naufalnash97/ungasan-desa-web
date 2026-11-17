@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource/instrument-serif/400-italic.css";
+
+/* Design tokens — docs/04-DBD.md §2 */
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+
+  --color-ink: #111111;
+  --color-ink-2: #16171b;
+  --color-muted: #6b6f78;
+  --color-line: #e6e7e8;
+  --color-line-soft: #ebebed;
+  --color-tint: #f4f5f6;
+  --color-bento: #f7f8f7;
+  --color-card: #fafafb;
+  --color-accent: #ff7a00;
+  --color-eyebrow: #c2410c;
+  --color-mint: #39d6aa;
+  --color-mint-ink: #147b62;
+  --color-c-blue: #3e7bfa;
+  --color-c-green: #2fa97c;
+  --color-c-orange: #ff9540;
+  --color-c-pink: #f06aa8;
+
+  --radius-btn: 6px;
+  --radius-bento: 8px;
+  --radius-kpi: 14px;
+}
+
+@layer base {
+  html { color: var(--color-ink); background: #fff; -webkit-font-smoothing: antialiased; }
+  body { font-family: var(--font-sans); font-feature-settings: "cv11", "ss01"; }
+  :focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; border-radius: 4px; }
+  ::selection { background: #ffe2c7; }
+}
+
+@utility container-x { @apply mx-auto w-full max-w-[1200px] px-5 md:px-6; }
+@utility eyebrow { @apply text-[0.8125rem] font-medium uppercase tracking-[0.08em] text-eyebrow; }
+@utility h-display { font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.02; letter-spacing: -0.035em; @apply font-semibold text-ink; }
+@utility h-section { font-size: clamp(1.875rem, 3.2vw, 2.5rem); line-height: 1.1; letter-spacing: -0.02em; @apply font-semibold text-ink; }
+@utility btn { @apply inline-flex items-center justify-center gap-2 rounded-btn px-4 h-10 text-sm font-medium transition-colors duration-150; }
+@utility btn-primary { @apply btn bg-ink text-white hover:bg-black/80; }
+@utility btn-secondary { @apply btn border border-line bg-white text-ink hover:bg-tint; }
+@utility btn-sm { @apply h-8 px-3 text-[0.8125rem]; }
+@utility card-kpi { @apply rounded-kpi border border-line-soft bg-card shadow-[0_1px_2px_rgba(0,0,0,.04)]; }
+@utility num { font-variant-numeric: tabular-nums; }
+
+@layer components {
+  .prose-desa { @apply text-[1rem] leading-[1.7] text-ink-2 max-w-[68ch]; }
+  .prose-desa h2 { @apply mt-10 mb-3 text-2xl font-semibold tracking-tight text-ink; }
+  .prose-desa h3 { @apply mt-8 mb-2 text-lg font-semibold text-ink; }
+  .prose-desa p { @apply my-4 text-muted; }
+  .prose-desa ul { @apply my-4 list-disc pl-6 text-muted; }
+  .prose-desa ol { @apply my-4 list-decimal pl-6 text-muted; }
+  .prose-desa li { @apply my-1; }
+  .prose-desa a { @apply underline underline-offset-4; }
+  .prose-desa blockquote { @apply my-6 border-l-2 border-accent pl-4 font-serif text-xl italic text-ink; }
+  .prose-desa strong { @apply text-ink; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}

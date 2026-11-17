@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ungasan
+      POSTGRES_PASSWORD: ungasan
+      POSTGRES_DB: ungasan
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ungasan"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgresql://ungasan:ungasan@db:5432/ungasan
+      ADMIN_API_TOKEN: ${ADMIN_API_TOKEN:?set ADMIN_API_TOKEN di .env}
+      IP_HASH_SALT: ${IP_HASH_SALT:?set IP_HASH_SALT di .env}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    ports: ["3000:3000"]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
