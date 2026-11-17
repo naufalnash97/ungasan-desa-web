@@ -1,4 +1,5 @@
 import { timingSafeEqual, createHash } from "node:crypto";
+import { trustedClientIp } from "./client-ip";
 
 /** Validasi header `Authorization: Bearer <ADMIN_API_TOKEN>` secara constant-time. */
 export function isAdmin(req: Request) {
@@ -11,7 +12,7 @@ export function isAdmin(req: Request) {
 }
 
 export function clientIp(req: Request) {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "0.0.0.0";
+  return trustedClientIp((n) => req.headers.get(n));
 }
 
 export function hashIp(ip: string) {

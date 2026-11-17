@@ -98,6 +98,24 @@ curl -X POST /api/v1/berita -H "Authorization: Bearer $ADMIN_API_TOKEN" -d '{...
   ├─ 401 token salah   ├─ 422 validasi   └─ 201 → tampil di beranda (dinamis)
 ```
 
+### Flow F — Operator mengelola konten (panel admin)
+```
+/admin ──(tanpa sesi)──▶ /admin/login ──email+password──▶ /admin (dasbor)
+  Dasbor: jumlah konten, APBDes aktif, aksi cepat, aktivitas terbaru
+  ├─ Berita & Pengumuman → daftar (filter kategori) → Tulis/Ubah (Markdown + Pratinjau) → Terbitkan
+  ├─ Halaman            → per bagian menu → Ubah isi / tautan eksternal
+  ├─ APBDes             → daftar tahun×versi → editor rincian (tambah/urut/hapus baris,
+  │                        peringatan selisih total, "Tampilkan di beranda") → Simpan
+  │                        └ "Buat APBDes baru" dapat menyalin rincian dari versi lain (untuk Perubahan)
+  ├─ Dokumen            → unggah PDF/gambar atau tautan → otomatis muncul di /transparansi/dokumen
+  ├─ Statistik          → per tahun → ubah L/P/Total per baris (Total kosong = L+P)
+  ├─ Layanan            → ubah kartu bento (ikon, ukuran, urutan, tampil/sembunyi)
+  ├─ Buku Tamu          → tinjau / hapus / unduh CSV
+  ├─ Akun saya          → ganti password
+  └─ (ADMIN) Pengguna, Log Audit
+Gagal validasi → pesan per-field, isian TIDAK hilang. Setiap aksi tercatat di log audit.
+```
+
 ## 4. Interaksi mega-menu
 | Input | Perilaku |
 |---|---|

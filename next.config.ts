@@ -14,8 +14,21 @@ const securityHeaders = [
 const config: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  // unggah dokumen lewat server action (maks. 20 MB, lihat src/lib/uploads.ts)
+  experimental: { serverActions: { bodySizeLimit: "21mb" } },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    return [
+      // Semua halaman kecuali /uploads (header global akan menimpa header route handler)
+      { source: "/:path((?!uploads/).*)", headers: securityHeaders },
+      // Dokumen unggahan: sandbox penuh — PDF/gambar tidak bisa menjalankan skrip di origin situs
+      {
+        source: "/uploads/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Content-Security-Policy", value: "sandbox; default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:" },
+        ],
+      },
+    ];
   },
 };
 

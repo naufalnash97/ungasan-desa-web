@@ -47,8 +47,33 @@ src/db/               skema, koneksi, seed (data riil APBDes 2026 & penduduk)
 src/lib/              data access, format rupiah, auth, rate-limit, markdown
 src/config/           navigation.ts — struktur mega-menu
 src/components/       MegaMenu, Hero, ServiceBento, StatsSection, ApbdesPanel, …
-src/app/              halaman + REST API /api/v1
+src/app/(site)/       halaman publik
+src/app/admin/        panel admin (login, server actions)
+src/app/api/          REST API /api/v1
 ```
+
+## Panel admin
+
+Buka **`/admin`**. Belum ada akun bawaan — buat akun pertama:
+
+```bash
+ADMIN_EMAIL=operator@ungasan.desa.id ADMIN_NAME="Operator Desa" ADMIN_PASSWORD='minimal-12-karakter' npm run admin:create
+```
+
+| Menu | Fungsi |
+|---|---|
+| Berita & Pengumuman | Tulis dengan Markdown + pratinjau, kategori, jadwal terbit, draf |
+| Halaman | Isi Profil / Pemerintahan / Transparansi / Layanan |
+| APBDes | Editor rincian per tahun & versi, cek selisih total, pilih versi di beranda |
+| Dokumen | Unggah PDF (maks. 20 MB) atau tautan |
+| Statistik | Data penduduk per tahun & kategori |
+| Layanan | Kartu bento: ikon, ukuran, urutan, tampil/sembunyi |
+| Buku Tamu | Tinjau, hapus, unduh CSV |
+| Pengguna · Log Audit | Khusus peran Admin |
+
+Peran **Editor** hanya mengelola konten; **Admin** juga mengelola pengguna dan melihat log audit. Detail keamanan: [docs/05-BSD.md §6](docs/05-BSD.md).
+
+![Panel admin — editor APBDes](docs/screenshots/admin-apbdes.png)
 
 ## API
 Lihat [docs/05-BSD.md §4](docs/05-BSD.md). Contoh: `GET /api/v1/apbdes?tahun=2026&versi=MURNI`.

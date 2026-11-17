@@ -151,3 +151,37 @@ export const siteSettings = pgTable("site_settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),
 });
+
+// ─────────────── Panel admin ───────────────
+export const adminRoleEnum = pgEnum("admin_role", ["ADMIN", "EDITOR"]);
+
+/** Operator panel admin. ADMIN = semua akses termasuk kelola pengguna; EDITOR = konten saja. */
+export const adminUsers = pgTable("admin_users", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name").notNull(),
+  passwordHash: text("password_hash").notNull(), // scrypt: salt$hash (hex)
+  role: adminRoleEnum("role").notNull().default("EDITOR"),
+  active: boolean("active").notNull().default(true),
+  lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+  createdAt: ts("created_at"),
+});
+
+/** Sesi login. Yang disimpan hanya SHA-256 dari token cookie — token mentah tidak pernah masuk DB. */
+export const adminSessions = pgTable("admin_sessions", {
+  id: text("id").primaryKey(), // sha256(token)
+  userId: integer("user_id").notNull().references(() => adminUsers.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: ts("created_at"),
+}, (t) => [index("admin_sessions_user_idx").on(t.userId)]);
+
+/** Jejak audit setiap perubahan dari panel admin (akuntabilitas pemerintah desa). */
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => adminUsers.id, { onDelete: "set null" }),
+  action: text("action").notNull(), // CREATE | UPDATE | DELETE | LOGIN | LOGOUT | UPLOAD
+  entity: text("entity").notNull(),
+  entityId: text("entity_id"),
+  summary: text("summary"),
+  createdAt: ts("created_at"),
+}, (t) => [index("audit_logs_created_idx").on(t.createdAt.desc())]);

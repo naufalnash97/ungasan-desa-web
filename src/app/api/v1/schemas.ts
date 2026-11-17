@@ -6,8 +6,8 @@ export const postInput = z.object({
   title: z.string().min(3).max(200),
   excerpt: z.string().max(300).optional(),
   body: z.string().min(1).max(50_000),
-  coverUrl: z.string().url().optional(),
-  videoUrl: z.string().url().optional(),
+  coverUrl: z.string().url().refine((u) => u.startsWith("https://"), "harus https://").optional(),
+  videoUrl: z.string().url().refine((u) => u.startsWith("https://"), "harus https://").optional(),
   publishedAt: z.coerce.date().optional(),
   published: z.boolean().optional(),
 });

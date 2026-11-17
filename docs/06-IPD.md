@@ -14,7 +14,8 @@
 | **5. DevOps** | Dockerfile multi-stage, docker-compose (app + Postgres), GitHub Actions CI | DevOps Automator | ✅ |
 | **6. QA** | Build, uji rute & API, screenshot desktop/mobile, review kode & a11y | Code Reviewer, Reality Checker, Accessibility Auditor | ✅ v1 |
 | **7. Konten** | Operator mengisi teks resmi, unggah PDF, foto perangkat | Operator desa | ⏳ |
-| **8. Fase 2** | Panel admin (Payload CMS / Directus di atas skema sama), pencarian FTS, peta OSM, kategori statistik lengkap, integrasi dKari | — | 📋 |
+| **8. Panel admin** | `/admin`: login, peran Admin/Editor, CRUD berita/halaman/APBDes/dokumen/statistik/layanan, unggah PDF, buku tamu + CSV, pengguna, log audit | Backend Architect, Frontend Developer, Code Reviewer | ✅ v1.1 |
+| **9. Fase berikutnya** | Pencarian FTS, peta OSM, unggah foto berita, 2FA admin, integrasi dKari | — | 📋 |
 
 ## 2. Langkah pembuatan (reproducible)
 
@@ -64,10 +65,24 @@ docker compose up -d --build # app + db, migrasi otomatis saat start
 - [ ] Lighthouse mobile ≥ 90/95 di server produksi (jalankan setelah deploy)
 - [ ] Uji 5 warga untuk metrik "paham APBDes < 15 detik"
 
+### Quality gate panel admin (uji end-to-end Playwright, 21 skenario lulus)
+- [x] Login salah ditolak, login benar → dasbor; logout mencabut sesi
+- [x] Validasi gagal tidak menghapus isian operator
+- [x] Berita baru → tampil di situs & announcement bar; hapus dengan konfirmasi
+- [x] Ubah realisasi APBDes → angka publik berubah; peringatan selisih total
+- [x] PDF asli terunggah & tersaji `application/pdf`; file palsu berekstensi .pdf ditolak
+- [x] Statistik & layanan → beranda berubah; buku tamu ditinjau + ekspor CSV
+- [x] Editor tidak bisa membuka Pengguna; aksi tercatat di Log Audit
+- [x] Review keamanan independen oleh agent **Code Reviewer** — 0 bypass autentikasi; 7 temuan (3 medium, 4 low) semuanya diperbaiki & diuji:
+  rate-limit memakai IP hop proxy tepercaya & tidak bisa di-reset · ganti password mencabut sesi lain · field opsional berita bisa dikosongkan ·
+  `setRole` divalidasi runtime · `saveBudget` dikunci & pesan galat tepat · semua URL wajib `https://` · unggahan cache 1 jam + `CSP: sandbox`
+- [x] Temuan tambahan saat uji: limit login hanya menghitung kegagalan (6× login sukses tidak terkunci); tanpa proxy, IP "unknown" tidak dijadikan kunci limit
+
 ## 5. Risiko & mitigasi
 | Risiko | P | D | Mitigasi |
 |---|---|---|---|
-| Operator kesulitan memakai API | Tinggi | Sedang | Fase 2 CMS; sementara skrip `curl` contoh di BSD |
+| Operator kesulitan memakai API | Rendah | Sedang | Panel admin `/admin` (v1.1); API tetap tersedia untuk integrasi |
+| Password operator lemah / bocor | Sedang | Tinggi | Minimal 12 karakter, rate-limit login, admin bisa nonaktifkan & reset; 2FA di fase berikutnya |
 | Tautan eksternal (SiLagas dll.) berubah | Sedang | Rendah | URL di tabel `services`, ubah tanpa deploy |
 | Rate-limit in-memory tidak berbagi antar instance | Rendah | Rendah | Satu instance cukup; Redis bila scale-out |
 

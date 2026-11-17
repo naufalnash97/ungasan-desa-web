@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
 
 // ADR-04: semua halaman dinamis — data selalu segar, build tidak butuh DB
 export const dynamic = "force-dynamic";
@@ -17,9 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="id">
       <body className="min-h-dvh">
-        <SiteHeader />
-        <main id="konten">{children}</main>
-        <SiteFooter />
+        {children}
       </body>
     </html>
   );

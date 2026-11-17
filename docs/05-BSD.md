@@ -91,3 +91,37 @@ npm run db:migrate    # terapkan ke DATABASE_URL
 npm run db:seed       # data riil Ungasan (idempoten)
 ```
 Aturan: migrasi hanya maju; kolom baru `NULL`/default dulu, backfill, baru `NOT NULL`.
+
+## 6. Panel admin (v1.1)
+
+Tabel tambahan (migrasi `drizzle/0001_admin_panel.sql`):
+
+| Tabel | Kolom penting | Catatan |
+|---|---|---|
+| `admin_users` | email (unik, disimpan huruf kecil), name, password_hash, role `ADMIN`/`EDITOR`, active, last_login_at | Hash **scrypt** dengan salt acak 16 byte: `scrypt$salt$hash` |
+| `admin_sessions` | id = **SHA-256(token)**, user_id FK cascade, expires_at | Token mentah hanya ada di cookie httpOnly `ungasan_admin`; masa berlaku 8 jam |
+| `audit_logs` | user_id (set null), action, entity, entity_id, summary, created_at | Dicatat oleh setiap server action; tidak bisa dihapus dari panel |
+
+### Peran & hak akses
+| Fitur | EDITOR | ADMIN |
+|---|---|---|
+| Berita, Halaman, APBDes, Dokumen, Statistik, Layanan, Buku Tamu | ✅ | ✅ |
+| Ganti password sendiri (`/admin/akun`) | ✅ | ✅ |
+| Kelola pengguna (`/admin/pengguna`) | — | ✅ |
+| Log audit (`/admin/audit`) | — | ✅ |
+
+### Lapisan keamanan
+1. `middleware.ts` — tanpa cookie → redirect ke `/admin/login` (cepat, di edge), header `noindex` + `no-store`.
+2. `requireAdmin()` di **layout dan setiap server action** — validasi sesi ke DB (sesi kedaluwarsa / user nonaktif ditolak).
+3. Server Actions Next.js — pemeriksaan Origin bawaan (anti-CSRF) + cookie `SameSite=Lax`.
+4. Login: hanya percobaan **gagal** yang dihitung — 5×/10 menit per email & 10×/10 menit per IP (blokir tidak bisa di-reset dengan membanjiri kunci acak), pesan galat generik, hash dummy agar waktu respons sama. IP diambil dari hop proxy tepercaya (`TRUSTED_PROXY_HOPS`, dihitung dari kanan `X-Forwarded-For`) — **wajib** pasang reverse proxy di produksi. Ganti password mencabut sesi di perangkat lain.
+5. Unggahan: maks. 20 MB, tipe diverifikasi dari **magic bytes** (PDF/PNG/JPG/WEBP), nama file acak, disajikan dari `UPLOAD_DIR` dengan pengunci path traversal, `CSP: sandbox`, cache 1 jam (dokumen yang dihapus cepat hilang). Semua kolom URL hanya menerima `https://`.
+6. Pratinjau Markdown dirender & disanitasi di server; ekspor CSV dilindungi dari formula injection.
+
+### Membuat akun pertama
+Tidak ada akun bawaan. Buat lewat CLI:
+```bash
+ADMIN_EMAIL=operator@ungasan.desa.id ADMIN_NAME="Operator Desa" ADMIN_PASSWORD='minimal-12-karakter' npm run admin:create
+# di Docker:
+docker compose exec -e ADMIN_EMAIL=... -e ADMIN_PASSWORD=... app npx tsx src/db/create-admin.ts
+```

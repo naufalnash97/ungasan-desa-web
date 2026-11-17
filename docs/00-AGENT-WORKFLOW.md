@@ -24,6 +24,7 @@ claude
 | 10 | DevOps (Docker, CI) | **DevOps Automator** | `engineering-devops-automator.md` | Software Architect |
 | 11 | README & dokumentasi | **Technical Writer** | `engineering-technical-writer.md` | Product Manager |
 | 12 | QA akhir | **Code Reviewer** + **Reality Checker** | `engineering-code-reviewer.md`, `testing-reality-checker.md` | — |
+| 13 | Panel admin `/admin` (v1.1) | Backend Architect (auth, server actions) + Frontend Developer (UI) | `engineering-backend-architect.md`, `engineering-frontend-developer.md` | **Code Reviewer** (review keamanan independen) |
 
 ## Urutan serah-terima (handoff)
 

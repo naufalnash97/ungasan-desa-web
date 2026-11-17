@@ -67,7 +67,7 @@ Tombol kanan header: **Hubungi Kami** (primer) + ikon pencarian.
 | F10 | REST API publik `/api/v1` (open data) | Should |
 | F11 | Admin API berbasis token untuk berita/pengumuman | Should |
 | F12 | Pencarian situs | Could |
-| F13 | Panel admin (CMS) visual | Won't (v1) → fase 2 |
+| F13 | Panel admin `/admin` — login, peran, CRUD konten, unggah dokumen, log audit | Must (v1.1) ✅ |
 | F14 | Multi-bahasa (EN/Bali) | Won't (v1) |
 
 ## 6. Non-goals

@@ -21,8 +21,13 @@ services:
       ADMIN_API_TOKEN: ${ADMIN_API_TOKEN:?set ADMIN_API_TOKEN di .env}
       IP_HASH_SALT: ${IP_HASH_SALT:?set IP_HASH_SALT di .env}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      UPLOAD_DIR: /app/uploads
+      # Pasang reverse proxy (nginx/Caddy) di depan app untuk produksi; 1 = satu proxy tepercaya
+      TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-1}
     ports: ["3000:3000"]
+    volumes: [uploads:/app/uploads]
     restart: unless-stopped
 
 volumes:
   pgdata:
+  uploads:

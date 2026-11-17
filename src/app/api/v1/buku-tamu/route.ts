@@ -9,8 +9,10 @@ export const dynamic = "force-dynamic";
 
 /** POST /api/v1/buku-tamu — publik, rate-limit 5/menit/IP, honeypot `website` */
 export async function POST(req: Request) {
-  const ipHash = hashIp(clientIp(req));
-  const rl = rateLimit(`gb:${ipHash}`);
+  const ip = clientIp(req);
+  const ipHash = hashIp(ip);
+  // Tanpa proxy tepercaya semua klien = "unknown" → pakai kuota bersama yang lebih longgar
+  const rl = ip === "unknown" ? rateLimit("gb:shared", 30) : rateLimit(`gb:${ipHash}`);
   if (!rl.ok) return fail(429, "RATE_LIMITED", "Terlalu banyak percobaan, coba lagi sebentar.", { retryAfter: rl.retryAfter });
   const parsed = guestbookInput.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return zodFail(parsed.error);

@@ -88,10 +88,12 @@ Next.js (MIT), React (MIT), Drizzle ORM (Apache-2.0), node-postgres (MIT), Postg
 | `ADMIN_API_TOKEN` | string acak ≥ 32 karakter | ya untuk endpoint admin |
 | `IP_HASH_SALT` | string acak | ya |
 | `NEXT_PUBLIC_SITE_URL` | `https://ungasan.desa.id` | ya |
+| `UPLOAD_DIR` | `/app/uploads` (volume Docker) | tidak (default `./uploads`) |
 
 ## 8. Keputusan arsitektur (ADR ringkas)
 - **ADR-01 Monolit Next.js vs API terpisah** → monolit; pisah menjadi service lain hanya jika ada konsumen API selain web.
 - **ADR-02 Navigasi di kode, bukan DB** → struktur menu jarang berubah dan perlu type-safety; konten tiap halaman tetap di DB.
 - **ADR-05 Drizzle, bukan Prisma** → tidak butuh binary engine, migrasi SQL bisa direview DBA.
+- **ADR-06 Panel admin dibangun sendiri (v1.1), bukan Payload/Directus** → CMS eksternal membuat tabel sendiri dan menggandakan skema; panel bawaan memakai tabel & validasi yang sama dengan API, satu container, satu login. Lihat BSD §6.
 - **ADR-03 Tanpa CMS di v1** → menghindari lock-in & beban hosting; skema dirancang agar Payload CMS (MIT) bisa ditempel di fase 2.
 - **ADR-04 Halaman dinamis (`force-dynamic`)** → data selalu segar dan build tidak butuh DB; caching via `Cache-Control` di reverse proxy bila trafik naik.

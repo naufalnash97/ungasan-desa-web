@@ -22,6 +22,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY drizzle ./drizzle
 COPY drizzle.config.ts package.json ./
 COPY src/db ./src/db
+COPY src/lib/password.ts ./src/lib/password.ts
+RUN mkdir -p /app/uploads && chown app:app /app/uploads
 USER app
 EXPOSE 3000
 HEALTHCHECK CMD wget -qO- http://localhost:3000/api/health || exit 1
